@@ -1,22 +1,22 @@
-FROM ubuntu:trusty
-MAINTAINER Daniel Jones <tortxof@gmail.com>
+FROM alpine
 
-RUN groupadd -r app && useradd -r -g app app && \
-    mkdir -p /home/app/.config/syncthing && \
-    chown -R app:app /home/app
+RUN apk add --no-cache wget ca-certificates
 
-ADD https://github.com/syncthing/syncthing/releases/download/v0.11.20/syncthing-linux-amd64-v0.11.20.tar.gz /
-RUN tar -xzf syncthing-linux-amd64-v0.11.20.tar.gz && \
-    rm syncthing-linux-amd64-v0.11.20.tar.gz && \
-    mv /syncthing-linux-amd64-v0.11.20 /app && \
-    chown -R app:app /app
+WORKDIR /app
 
-WORKDIR /home/app
+RUN wget https://github.com/syncthing/syncthing/releases/download/v0.14.39/syncthing-linux-amd64-v0.14.39.tar.gz
 
-USER app
+RUN tar -xvf syncthing-linux-amd64-v0.14.39.tar.gz
 
-EXPOSE 8384 22000
+FROM busybox
 
-VOLUME ["/home/app/.config/syncthing", "/home/app/Sync"]
+WORKDIR /app
 
-CMD ["/app/syncthing"]
+RUN addgroup -S syncthing && \
+    adduser -D -S -h /app -G syncthing syncthing
+
+USER syncthing
+
+COPY --from=0 /app/syncthing-linux-amd64-v0.14.39/syncthing .
+
+CMD ["./syncthing", "-no-browser", "-gui-address=0.0.0.0:8384"]

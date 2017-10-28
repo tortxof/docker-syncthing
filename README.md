@@ -1,22 +1,17 @@
 # docker-syncthing
 
-Build the image.
+The config directory in the container is `/app/.config/syncthing`.
 
-    docker build -t tortxof/syncthing .
+Run the container with a volume for the config and one or more volumes for the
+shared data. You may also want to run the container with a uid and gid from your
+host system.
 
-Run a container. You'll need to edit the `config.xml` to change the bind address
-after the first run.
-
-    docker run -d --restart always --name syncthing -p 8000:8384 -p 22000:22000 tortxof/syncthing
-
-Edit the config.
-
-    docker run -ti --rm --volumes-from syncthing tortxof/util nano /home/app/.config/syncthing/config.xml
-
-Restart the container.
-
-    docker restart syncthing
-
-Create a data container.
-
-    docker create --name syncthing-data --volumes-from syncthing busybox
+```
+docker run -d --restart always \
+  --name syncthing \
+  -p 8384:8384 \
+  -p 22000:22000 \
+  -v /config/dir/on/host:/app/.config/syncthing \
+  -v /data/dir/on/host:/data/dir/in/container \
+  tortxof/syncthing
+```
