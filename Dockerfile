@@ -19,4 +19,4 @@ USER syncthing
 
 COPY --from=0 /app/syncthing-linux-amd64-v0.14.39/syncthing .
 
-CMD ["./syncthing", "-no-browser", "-gui-address=0.0.0.0:8384"]
+CMD ["./syncthing", "-no-browser", "-gui-address=0.0.0.0:8384", "-home=/app/config"]
